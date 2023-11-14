@@ -1,0 +1,1 @@
+# teste-docker-nginx-node-postgres-redis
