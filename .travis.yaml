@@ -1,0 +1,23 @@
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t dekefective/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true dekefective/react-test npm test
+
+after_success:
+  - docker build -t dekefective/multi-client ./client
+  - docker build -t dekefective/multi-nginx ./nginx
+  - docker build -t dekefective/multi-server ./server
+  - docker build -t dekefective/multi-worker ./worker
+  # Log into Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take images and push them to Ducker Hub
+  - docker push dekefective/multi-client
+  - docker push dekefective/multi-nginx
+  - docker push dekefective/multi-server
+  - docker push dekefective/multi-worker
